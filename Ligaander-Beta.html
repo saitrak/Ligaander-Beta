@@ -1,0 +1,3111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ligaander-Beta</title>
+    <style>
+        :root {
+            --primary-color: #6C5CE7;
+            --primary-light: #EDE7F6;
+            --secondary-color: #f0f2f5;
+            --text-primary: #2D3436;
+            --text-secondary: #636E72;
+            --text-light: #ffffff;
+            --border-color: #DFE6E9;
+            --online-status: #00B894;
+            --your-message-bg: #6C5CE7;
+            --their-message-bg: #E8F4F8;
+            --hover-color: #f5f5f5;
+            --active-color: #EDE7F6;
+            --error-color: #FF7675;
+            --link-preview-bg: #FFEBEE;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: var(--secondary-color);
+            color: var(--text-primary);
+        }
+
+        /* Auth Screen */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            background-color: var(--primary-light);
+        }
+
+        .auth-box {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .auth-title {
+            text-align: center;
+            margin-bottom: 24px;
+            color: var(--primary-color);
+            font-size: 24px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .auth-input {
+            padding: 12px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 16px;
+            outline: none;
+        }
+
+        .auth-input:focus {
+            border-color: var(--primary-color);
+        }
+
+        .auth-button {
+            padding: 12px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .auth-button:hover {
+            background-color: #5D4BCC;
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 16px;
+            color: var(--text-secondary);
+        }
+
+        .auth-switch span {
+            color: var(--primary-color);
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .auth-error {
+            color: var(--error-color);
+            font-size: 14px;
+            margin-top: 8px;
+            text-align: center;
+            display: none;
+        }
+
+        /* Main App */
+        .app-container {
+            display: none;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 360px;
+            background-color: #ffffff;
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 18px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .user-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 10px;
+            height: 10px;
+            background-color: var(--online-status);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .sidebar-actions {
+            display: flex;
+            gap: 16px;
+        }
+
+        .sidebar-actions i {
+            color: white;
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+
+        .sidebar-actions i:hover {
+            color: var(--primary-light);
+        }
+
+        /* Search */
+        .search-container {
+            padding: 10px 16px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-box {
+            background-color: var(--secondary-color);
+            border-radius: 18px;
+            padding: 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .search-box i {
+            color: var(--text-secondary);
+            font-size: 16px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            width: 100%;
+            outline: none;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        /* Chats list */
+        .chats-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-item {
+            display: flex;
+            padding: 10px 16px;
+            gap: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .chat-item:hover {
+            background-color: var(--hover-color);
+        }
+
+        .chat-item.active {
+            background-color: var(--active-color);
+        }
+
+        .chat-avatar {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--secondary-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary-color);
+            font-size: 22px;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .chat-avatar.online::after {
+            content: '';
+            position: absolute;
+            bottom: 2px;
+            right: 2px;
+            width: 12px;
+            height: 12px;
+            background-color: var(--online-status);
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .chat-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            min-width: 0;
+        }
+
+        .chat-name {
+            font-weight: 600;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-preview {
+            font-size: 14px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-time {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        /* Main chat area */
+        .main-chat {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            background-color: #f8f9fa;
+        }
+
+        .chat-header {
+            padding: 12px 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #ffffff;
+        }
+
+        .chat-header-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-header-actions {
+            display: flex;
+            gap: 16px;
+            position: relative;
+        }
+
+        .chat-header-actions i {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 20px;
+            transition: color 0.2s;
+        }
+
+        .chat-header-actions i:hover {
+            color: var(--primary-color);
+        }
+
+        /* Messages area */
+        .messages-container {
+            flex: 1;
+            padding: 16px;
+            overflow-y: auto;
+            background-image: url('https://www.facebook.com/images/messenger/chat-bubble-bg.png');
+            background-repeat: repeat;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .message {
+            max-width: 70%;
+            padding: 8px 16px;
+            border-radius: 18px;
+            font-size: 15px;
+            position: relative;
+            word-wrap: break-word;
+            line-height: 1.4;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.sent {
+            align-self: flex-end;
+            background-color: var(--your-message-bg);
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.received {
+            align-self: flex-start;
+            background-color: var(--their-message-bg);
+            color: var(--text-primary);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: rgba(255, 255, 255, 0.7);
+            text-align: right;
+            margin-top: 4px;
+            display: block;
+        }
+
+        .message.received .message-time {
+            color: rgba(0, 0, 0, 0.4);
+        }
+
+        /* Message actions */
+        .message-actions {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            display: none;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            z-index: 10;
+        }
+
+        .message:hover .message-actions {
+            display: flex;
+        }
+
+        .message-action {
+            padding: 6px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s;
+        }
+
+        .message-action:hover {
+            color: var(--primary-color);
+        }
+
+        /* Link preview */
+        .link-preview {
+            margin-top: 8px;
+            padding: 8px;
+            background-color: var(--link-preview-bg);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            max-width: 300px;
+            cursor: pointer;
+        }
+
+        .link-preview-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .link-preview-description {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+        }
+
+        .link-preview-url {
+            font-size: 12px;
+            color: var(--primary-color);
+            word-break: break-all;
+        }
+
+        /* Emoji picker */
+        .emoji-picker {
+            position: absolute;
+            bottom: 60px;
+            right: 20px;
+            width: 300px;
+            height: 300px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 10px;
+            display: none;
+            z-index: 100;
+            overflow-y: auto;
+        }
+
+        .emoji-picker.active {
+            display: block;
+        }
+
+        .emoji-category {
+            margin-bottom: 10px;
+        }
+
+        .emoji-category-title {
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+        }
+
+        .emoji-grid {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 5px;
+        }
+
+        .emoji {
+            font-size: 20px;
+            cursor: pointer;
+            text-align: center;
+            padding: 4px;
+            border-radius: 4px;
+        }
+
+        .emoji:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* Friend options menu */
+        .friend-options {
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            padding: 8px 0;
+            min-width: 200px;
+            z-index: 100;
+            display: none;
+        }
+
+        .friend-options.active {
+            display: block;
+        }
+
+        .friend-option {
+            padding: 8px 16px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .friend-option:hover {
+            background-color: var(--hover-color);
+        }
+
+        .friend-option.delete {
+            color: var(--error-color);
+        }
+
+        /* Message input */
+        .message-input-container {
+            padding: 12px 16px;
+            background-color: #ffffff;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 10px 16px;
+            border-radius: 20px;
+            border: none;
+            background-color: var(--secondary-color);
+            outline: none;
+            font-size: 15px;
+            color: var(--text-primary);
+        }
+
+        .input-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .input-actions i {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 24px;
+            transition: color 0.2s;
+        }
+
+        .input-actions i:hover {
+            color: var(--primary-color);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: absolute;
+                width: 100%;
+                height: 100%;
+                z-index: 10;
+                transform: translateX(-100%);
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-chat {
+                display: none;
+            }
+            
+            .main-chat.active {
+                display: flex;
+            }
+            
+            .mobile-menu-btn {
+                display: block;
+            }
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: var(--primary-color);
+            padding: 8px;
+            margin-right: 8px;
+        }
+
+        /* Add friend modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 15px;
+            margin-bottom: 12px;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .modal-btn {
+            padding: 8px 16px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .modal-btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .modal-btn-secondary {
+            background-color: var(--secondary-color);
+            color: var(--text-primary);
+        }
+
+        /* ID display */
+        .user-id-display {
+            font-size: 12px;
+            color: var(--text-light);
+            margin-top: 4px;
+            font-family: monospace;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 2px 6px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Empty states */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            text-align: center;
+            padding: 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--secondary-color);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message {
+            animation: fadeIn 0.2s ease-out;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        /* Image preview modal */
+        .image-preview-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.8);
+            z-index: 200;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .image-preview-content {
+            max-width: 90%;
+            max-height: 90%;
+        }
+
+        .image-preview-content img {
+            max-width: 100%;
+            max-height: 90vh;
+            border-radius: 8px;
+        }
+
+        .close-preview {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+        }
+
+        /* Custom name modal */
+        .custom-name-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        /* Attachment button */
+        .attachment-preview {
+            margin-top: 8px;
+            padding: 8px;
+            background-color: var(--secondary-color);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            max-width: 300px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .attachment-icon {
+            font-size: 20px;
+        }
+
+        .attachment-name {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Video player */
+        .video-player {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        /* Emoji search */
+        .emoji-search {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+
+        /* Profile options */
+        .profile-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 16px;
+        }
+
+        .profile-option {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .profile-option:hover {
+            background-color: var(--hover-color);
+        }
+
+        /* Privacy settings modal */
+        .privacy-settings-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .privacy-settings-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .privacy-setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .privacy-setting label {
+            font-weight: 500;
+        }
+
+        .privacy-setting select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Blocklist modal */
+        .blocklist-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .blocklist-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .blocklist-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .blocklist-item:last-child {
+            border-bottom: none;
+        }
+
+        .unblock-btn {
+            padding: 5px 10px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Change username modal */
+        .change-username-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .change-username-content {
+            background-color: white;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+</head>
+<body>
+    <!-- Auth Screen -->
+    <div class="auth-container" id="auth-container">
+        <div class="auth-box">
+            <div class="auth-title">Ligaander-Beta</div>
+            <div class="auth-form" id="login-form">
+                <input type="text" class="auth-input" id="login-username" placeholder="Username">
+                <input type="password" class="auth-input" id="login-password" placeholder="Password">
+                <button class="auth-button" id="login-button">Login</button>
+                <div class="auth-error" id="login-error"></div>
+                <div class="auth-switch">Don't have an account? <span id="switch-to-register">Register</span></div>
+            </div>
+            <div class="auth-form" id="register-form" style="display: none;">
+                <input type="text" class="auth-input" id="register-username" placeholder="Username">
+                <input type="password" class="auth-input" id="register-password" placeholder="Password">
+                <input type="password" class="auth-input" id="register-confirm" placeholder="Confirm Password">
+                <button class="auth-button" id="register-button">Register</button>
+                <div class="auth-error" id="register-error"></div>
+                <div class="auth-switch">Already have an account? <span id="switch-to-login">Login</span></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app-container" id="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div class="user-avatar online" id="current-user-avatar">Y</div>
+                    <div>
+                        <div id="current-user-name">You</div>
+                        <div class="user-id-display" id="current-user-id">ID: loading...</div>
+                    </div>
+                </div>
+                <div class="sidebar-actions">
+                    <i class="fas fa-user-plus" id="add-friend-btn"></i>
+                    <i class="fas fa-cog" id="settings-btn"></i>
+                </div>
+            </div>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="Search Ligaander" id="search-input">
+                </div>
+            </div>
+
+            <div class="chats-list" id="chats-list">
+                <!-- Chats will be loaded here -->
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="main-chat" id="main-chat">
+            <div class="chat-header">
+                <button class="mobile-menu-btn" id="back-to-chats">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <div class="chat-header-info">
+                    <div class="user-avatar" id="current-chat-avatar">L</div>
+                    <div>
+                        <div id="current-chat-name">Ligaander Bot</div>
+                        <div style="font-size: 12px; color: var(--text-secondary);" id="current-chat-status">Select a chat</div>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <i class="fas fa-ellipsis-h" id="friend-options-btn"></i>
+                    <div class="friend-options" id="friend-options">
+                        <div class="friend-option" id="set-custom-name">Set Custom Name</div>
+                        <div class="friend-option" id="view-profile">View Profile</div>
+                        <div class="friend-option" id="block-friend">Block</div>
+                        <div class="friend-option delete" id="delete-friend">Delete</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messages-container">
+                <div class="empty-state">
+                    <i class="fas fa-comment-dots"></i>
+                    <h3>No chat selected</h3>
+                    <p>Select a conversation or add a friend to start messaging</p>
+                </div>
+            </div>
+
+            <div class="message-input-container">
+                <div class="input-actions">
+                    <i class="fas fa-paperclip" id="attachment-btn"></i>
+                    <input type="file" id="file-input" style="display: none;">
+                    <i class="far fa-smile" id="emoji-btn"></i>
+                </div>
+                <input type="text" class="message-input" placeholder="Type a message..." id="message-input" disabled>
+                <div class="input-actions">
+                    <i class="fas fa-paper-plane" id="send-btn"></i>
+                </div>
+                
+                <!-- Emoji Picker -->
+                <div class="emoji-picker" id="emoji-picker">
+                    <input type="text" class="emoji-search" id="emoji-search" placeholder="Search emojis...">
+                    <div class="emoji-category">
+                        <div class="emoji-category-title">Smileys & People</div>
+                        <div class="emoji-grid" id="smileys-people">
+                            <!-- Emojis will be added here by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="emoji-category">
+                        <div class="emoji-category-title">Animals & Nature</div>
+                        <div class="emoji-grid" id="animals-nature">
+                            <!-- Emojis will be added here by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="emoji-category">
+                        <div class="emoji-category-title">Food & Drink</div>
+                        <div class="emoji-grid" id="food-drink">
+                            <!-- Emojis will be added here by JavaScript -->
+                        </div>
+                    </div>
+                    <div class="emoji-category">
+                        <div class="emoji-category-title">Activities</div>
+                        <div class="emoji-grid" id="activities">
+                            <!-- Emojis will be added here by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Friend Modal -->
+        <div class="modal" id="add-friend-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Add Friend</div>
+                    <button class="close-modal" id="close-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="modal-input" id="friend-id-input" placeholder="Enter friend's ID">
+                    <div id="add-friend-error" style="color: #f02849; font-size: 13px; display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="cancel-add-friend">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="confirm-add-friend">Add Friend</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div class="modal" id="settings-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Your Profile</div>
+                    <button class="close-modal" id="close-settings-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: flex; align-items: center; gap: 16px; margin-bottom: 20px;">
+                        <div class="user-avatar online" style="width: 60px; height: 60px; font-size: 24px;" id="settings-avatar">Y</div>
+                        <div>
+                            <div style="font-weight: 600; margin-bottom: 4px;" id="settings-name">You</div>
+                            <div class="user-id-display" id="settings-id">ID: loading...</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Display Name</label>
+                        <input type="text" class="modal-input" id="name-input" placeholder="Enter your name">
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <label style="display: block; margin-bottom: 6px; font-weight: 500;">Profile Picture</label>
+                        <input type="file" id="avatar-upload" accept="image/*" style="display: none;">
+                        <button class="modal-btn modal-btn-secondary" id="upload-avatar-btn">Upload Image</button>
+                    </div>
+                    <div class="profile-options">
+                        <div class="profile-option" id="change-username-btn">Change Username</div>
+                        <div class="profile-option" id="change-password-btn">Change Password</div>
+                        <div class="profile-option" id="privacy-settings-btn">Privacy Settings</div>
+                        <div class="profile-option" id="blocklist-btn">Blocklist</div>
+                        <div class="profile-option delete" id="delete-account-btn">Delete Account</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="cancel-settings">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="save-settings">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Custom Name Modal -->
+        <div class="modal" id="custom-name-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Set Custom Name</div>
+                    <button class="close-modal" id="close-custom-name-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="custom-name-input" id="custom-name-input" placeholder="Enter custom name">
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="cancel-custom-name">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="save-custom-name">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Image Preview Modal -->
+        <div class="image-preview-modal" id="image-preview-modal">
+            <span class="close-preview" id="close-preview">&times;</span>
+            <div class="image-preview-content" id="image-preview-content"></div>
+        </div>
+
+        <!-- Profile View Modal -->
+        <div class="modal" id="profile-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title" id="profile-modal-title">Profile</div>
+                    <button class="close-modal" id="close-profile-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div style="display: flex; flex-direction: column; align-items: center; gap: 16px; margin-bottom: 20px;">
+                        <div class="user-avatar" style="width: 100px; height: 100px; font-size: 40px;" id="profile-avatar">L</div>
+                        <div style="text-align: center;">
+                            <div style="font-weight: 600; font-size: 20px;" id="profile-name">Ligaander Bot</div>
+                            <div class="user-id-display" style="margin-top: 8px;" id="profile-id">ID: ligaander_bot</div>
+                            <div style="margin-top: 8px; color: var(--text-secondary);" id="profile-status">Online</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 20px;">
+                        <div style="font-weight: 600; margin-bottom: 8px;">About</div>
+                        <div style="color: var(--text-secondary);" id="profile-about">Official Ligaander Bot</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Password Modal -->
+        <div class="modal" id="password-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Change Password</div>
+                    <button class="close-modal" id="close-password-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="password" class="modal-input" id="current-password" placeholder="Current Password">
+                    <input type="password" class="modal-input" id="new-password" placeholder="New Password">
+                    <input type="password" class="modal-input" id="confirm-new-password" placeholder="Confirm New Password">
+                    <div id="password-error" style="color: #f02849; font-size: 13px; display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="cancel-password">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="save-password">Change Password</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Privacy Settings Modal -->
+        <div class="privacy-settings-modal" id="privacy-settings-modal">
+            <div class="privacy-settings-content">
+                <div class="modal-header">
+                    <div class="modal-title">Privacy Settings</div>
+                    <button class="close-modal" id="close-privacy-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="privacy-setting">
+                        <label>Who can add you as a friend?</label>
+                        <select id="friend-privacy">
+                            <option value="everyone">Everyone</option>
+                            <option value="friends-of-friends">Friends of Friends</option>
+                            <option value="nobody">Nobody</option>
+                        </select>
+                    </div>
+                    <div class="privacy-setting">
+                        <label>Who can see your online status?</label>
+                        <select id="status-privacy">
+                            <option value="everyone">Everyone</option>
+                            <option value="friends">Friends Only</option>
+                            <option value="nobody">Nobody</option>
+                        </select>
+                    </div>
+                    <div class="privacy-setting">
+                        <label>Who can see your profile picture?</label>
+                        <select id="avatar-privacy">
+                            <option value="everyone">Everyone</option>
+                            <option value="friends">Friends Only</option>
+                            <option value="nobody">Nobody</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="cancel-privacy">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="save-privacy">Save</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Blocklist Modal -->
+        <div class="blocklist-modal" id="blocklist-modal">
+            <div class="blocklist-content">
+                <div class="modal-header">
+                    <div class="modal-title">Blocked Users</div>
+                    <button class="close-modal" id="close-blocklist-modal">&times;</button>
+                </div>
+                <div class="modal-body" id="blocklist-body">
+                    <!-- Blocked users will be listed here -->
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-primary" id="close-blocklist">Close</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Change Username Modal -->
+        <div class="change-username-modal" id="change-username-modal">
+            <div class="change-username-content">
+                <div class="modal-header">
+                    <div class="modal-title">Change Username</div>
+                    <button class="close-modal" id="close-username-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <input type="text" class="modal-input" id="new-username" placeholder="New Username">
+                    <input type="password" class="modal-input" id="username-password" placeholder="Current Password">
+                    <div id="username-error" style="color: #f02849; font-size: 13px; display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="cancel-username">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="save-username">Change Username</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Account Modal -->
+        <div class="modal" id="delete-account-modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div class="modal-title">Delete Account</div>
+                    <button class="close-modal" id="close-delete-modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <p style="margin-bottom: 15px;">Are you sure you want to delete your account? This action cannot be undone.</p>
+                    <input type="password" class="modal-input" id="delete-password" placeholder="Enter your password to confirm">
+                    <div id="delete-error" style="color: #f02849; font-size: 13px; display: none;"></div>
+                </div>
+                <div class="modal-footer">
+                    <button class="modal-btn modal-btn-secondary" id="cancel-delete">Cancel</button>
+                    <button class="modal-btn modal-btn-primary" id="confirm-delete">Delete Account</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ==============================================
+        // Account System
+        // ==============================================
+
+        // Load accounts from localStorage or initialize empty object
+        let accountsDB = JSON.parse(localStorage.getItem('ligaanderAccounts')) || {};
+        
+        // Current account state
+        let currentAccount = null;
+        let currentUserData = null;
+        let conversations = null;
+        let peer = null;
+        let connections = {};
+        let pendingMessages = {}; // Stores messages waiting to be delivered
+        let connectionAttempts = {}; // Tracks connection attempts to peers
+        let blockedUsers = JSON.parse(localStorage.getItem('ligaanderBlockedUsers')) || {};
+        let currentAttachment = null;
+        let privacySettings = JSON.parse(localStorage.getItem('ligaanderPrivacySettings')) || {
+            friendRequests: 'everyone',
+            onlineStatus: 'everyone',
+            profilePicture: 'everyone'
+        };
+
+        // DOM elements
+        const authContainer = document.getElementById('auth-container');
+        const appContainer = document.getElementById('app-container');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        const loginButton = document.getElementById('login-button');
+        const registerButton = document.getElementById('register-button');
+        const switchToRegister = document.getElementById('switch-to-register');
+        const switchToLogin = document.getElementById('switch-to-login');
+        const loginError = document.getElementById('login-error');
+        const registerError = document.getElementById('register-error');
+
+        // Switch between login and register forms
+        switchToRegister.addEventListener('click', () => {
+            loginForm.style.display = 'none';
+            registerForm.style.display = 'flex';
+            loginError.style.display = 'none';
+            registerError.style.display = 'none';
+        });
+
+        switchToLogin.addEventListener('click', () => {
+            registerForm.style.display = 'none';
+            loginForm.style.display = 'flex';
+            loginError.style.display = 'none';
+            registerError.style.display = 'none';
+        });
+
+        // Register new account
+        registerButton.addEventListener('click', () => {
+            const username = document.getElementById('register-username').value.trim();
+            const password = document.getElementById('register-password').value;
+            const confirm = document.getElementById('register-confirm').value;
+
+            // Validate
+            if (!username || !password || !confirm) {
+                registerError.textContent = 'Please fill all fields';
+                registerError.style.display = 'block';
+                return;
+            }
+
+            if (password !== confirm) {
+                registerError.textContent = 'Passwords do not match';
+                registerError.style.display = 'block';
+                return;
+            }
+
+            if (accountsDB[username]) {
+                registerError.textContent = 'Username already exists';
+                registerError.style.display = 'block';
+                return;
+            }
+
+            // Create account
+            accountsDB[username] = {
+                password: hashPassword(password), // In a real app, use proper hashing
+                data: createNewAccountData(username)
+            };
+
+            // Save to localStorage
+            localStorage.setItem('ligaanderAccounts', JSON.stringify(accountsDB));
+
+            // Login the new user
+            loginUser(username, password);
+        });
+
+        // Login existing account
+        loginButton.addEventListener('click', () => {
+            const username = document.getElementById('login-username').value.trim();
+            const password = document.getElementById('login-password').value;
+
+            if (!username || !password) {
+                loginError.textContent = 'Please fill all fields';
+                loginError.style.display = 'block';
+                return;
+            }
+
+            loginUser(username, password);
+        });
+
+        // Simple password hashing (in a real app, use proper hashing)
+        function hashPassword(password) {
+            return password.split('').reverse().join(''); // Just for demo!
+        }
+
+        // Create new account data
+        function createNewAccountData(username) {
+            const userId = generateUniqueId();
+            
+            const userData = {
+                name: username,
+                avatar: username.charAt(0).toUpperCase(),
+                avatarImage: null,
+                friends: [],
+                userId: userId,
+                customNames: {},
+                about: "Hey there! I'm using Ligaander"
+            };
+
+            const conversations = {};
+
+            // Add Ligaander Bot as first friend
+            const botId = 'ligaander_bot';
+            userData.friends.push({
+                id: botId,
+                name: 'Ligaander Bot',
+                avatar: 'L',
+                status: 'Online',
+                lastSeen: null,
+                isBot: true,
+                about: 'Official Ligaander Bot powered by Gemini API'
+            });
+
+            // Add welcome conversation
+            conversations[botId] = [
+                {
+                    id: 'msg1',
+                    sender: botId,
+                    text: 'Hello! I\'m Ligaander Bot, your assistant for the Ligaander messenger.',
+                    timestamp: Date.now() - 3600000
+                },
+                {
+                    id: 'msg2',
+                    sender: botId,
+                    text: 'You can ask me anything about Ligaander features, settings, or how to use this app.',
+                    timestamp: Date.now() - 3500000
+                },
+                {
+                    id: 'msg3',
+                    sender: 'currentUser',
+                    text: 'Hi! How does this work?',
+                    timestamp: Date.now() - 3400000
+                },
+                {
+                    id: 'msg4',
+                    sender: botId,
+                    text: 'You can add friends by their ID and start chatting with them. Try sending me a message about what you need help with!',
+                    timestamp: Date.now() - 3300000
+                }
+            ];
+
+            return { userData, conversations };
+        }
+
+        // Login user
+        function loginUser(username, password) {
+            const account = accountsDB[username];
+            
+            if (!account || account.password !== hashPassword(password)) {
+                loginError.textContent = 'Invalid username or password';
+                loginError.style.display = 'block';
+                return;
+            }
+
+            currentAccount = username;
+            currentUserData = account.data.userData;
+            conversations = account.data.conversations;
+            pendingMessages = {}; // Reset pending messages on login
+
+            // Initialize the app
+            initializeApp();
+        }
+
+        // Save account data
+        function saveAccountData() {
+            if (!currentAccount) return;
+            accountsDB[currentAccount].data = {
+                userData: currentUserData,
+                conversations: conversations
+            };
+            localStorage.setItem('ligaanderAccounts', JSON.stringify(accountsDB));
+            localStorage.setItem('ligaanderBlockedUsers', JSON.stringify(blockedUsers));
+            localStorage.setItem('ligaanderPrivacySettings', JSON.stringify(privacySettings));
+        }
+
+        // ==============================================
+        // App Functionality
+        // ==============================================
+
+        // Unique ID Generator
+        function generateUniqueId() {
+            return 'user_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now().toString(36);
+        }
+
+        // Initialize PeerJS
+        function initializePeerJS() {
+            peer = new Peer(currentUserData.userId, {
+                host: '0.peerjs.com',
+                port: 443,
+                path: '/',
+                secure: true,
+                debug: 3
+            });
+
+            peer.on('open', (id) => {
+                console.log('PeerJS connected with ID:', id);
+                
+                // Try to deliver any pending messages
+                deliverPendingMessages();
+            });
+
+            peer.on('connection', (conn) => {
+                console.log('Incoming connection from:', conn.peer);
+                
+                // Check if this user is blocked
+                if (blockedUsers[conn.peer]) {
+                    conn.close();
+                    return;
+                }
+                
+                setupConnection(conn);
+            });
+
+            peer.on('error', (err) => {
+                console.error('PeerJS error:', err);
+                
+                // Attempt to reconnect
+                setTimeout(initializePeerJS, 5000);
+            });
+
+            peer.on('disconnected', () => {
+                console.log('PeerJS disconnected');
+                
+                // Attempt to reconnect
+                setTimeout(initializePeerJS, 5000);
+            });
+        }
+
+        // Setup a data connection
+        function setupConnection(conn) {
+            conn.on('open', () => {
+                console.log('Connection established with:', conn.peer);
+                connections[conn.peer] = conn;
+                
+                // Clear any pending connection attempts
+                if (connectionAttempts[conn.peer]) {
+                    clearInterval(connectionAttempts[conn.peer]);
+                    delete connectionAttempts[conn.peer];
+                }
+                
+                // Send our user data
+                conn.send({
+                    type: 'user-data',
+                    data: currentUserData
+                });
+                
+                // Check if we already have this friend
+                const existingFriend = currentUserData.friends.find(f => f.id === conn.peer);
+                if (!existingFriend && !blockedUsers[conn.peer]) {
+                    // Add as a new friend
+                    const newFriend = {
+                        id: conn.peer,
+                        name: `Friend (${conn.peer.substring(0, 6)}...)`,
+                        avatar: 'F',
+                        status: 'Online',
+                        lastSeen: Date.now(),
+                        about: "Hey there! I'm using Ligaander"
+                    };
+                    
+                    currentUserData.friends.push(newFriend);
+                    saveAccountData();
+                    
+                    if (!conversations[conn.peer]) {
+                        conversations[conn.peer] = [];
+                        saveAccountData();
+                    }
+                    
+                    renderChatsList();
+                }
+                
+                // Deliver any pending messages for this peer
+                deliverPendingMessages(conn.peer);
+            });
+            
+            conn.on('data', (data) => {
+                console.log('Received data:', data);
+                handleIncomingData(conn.peer, data);
+            });
+            
+            conn.on('close', () => {
+                console.log('Connection closed with:', conn.peer);
+                delete connections[conn.peer];
+                
+                // Update friend status
+                const friend = currentUserData.friends.find(f => f.id === conn.peer);
+                if (friend) {
+                    friend.lastSeen = Date.now();
+                    saveAccountData();
+                    renderChatsList();
+                    
+                    if (currentChatId === conn.peer) {
+                        currentChatStatus.textContent = `Last seen ${formatLastSeen(friend.lastSeen)}`;
+                        currentChatStatus.style.color = 'var(--text-secondary)';
+                    }
+                }
+            });
+            
+            conn.on('error', (err) => {
+                console.error('Connection error:', err);
+                delete connections[conn.peer];
+            });
+        }
+
+        // Connect to another peer with retry logic
+        function connectToPeer(peerId) {
+            if (connections[peerId]) {
+                console.log('Already connected to:', peerId);
+                return;
+            }
+            
+            // If we're already trying to connect, don't start another attempt
+            if (connectionAttempts[peerId]) return;
+            
+            console.log('Attempting to connect to:', peerId);
+            
+            // Start connection attempt
+            const conn = peer.connect(peerId, {
+                reliable: true,
+                serialization: 'json'
+            });
+            
+            setupConnection(conn);
+            
+            // Set up retry mechanism if connection fails
+            connectionAttempts[peerId] = setInterval(() => {
+                if (!connections[peerId]) {
+                    console.log('Retrying connection to:', peerId);
+                    const retryConn = peer.connect(peerId, {
+                        reliable: true,
+                        serialization: 'json'
+                    });
+                    setupConnection(retryConn);
+                } else {
+                    clearInterval(connectionAttempts[peerId]);
+                    delete connectionAttempts[peerId];
+                }
+            }, 10000); // Retry every 10 seconds
+        }
+
+        // Handle incoming data
+        function handleIncomingData(peerId, data) {
+            if (data.type === 'user-data') {
+                // Update friend's data
+                const friend = currentUserData.friends.find(f => f.id === peerId);
+                if (friend) {
+                    friend.name = data.data.name || friend.name;
+                    friend.avatar = data.data.avatar || friend.avatar;
+                    friend.avatarImage = data.data.avatarImage || friend.avatarImage;
+                    friend.about = data.data.about || friend.about;
+                    friend.lastSeen = Date.now();
+                    saveAccountData();
+                    renderChatsList();
+                    
+                    if (currentChatId === peerId) {
+                        currentChatName.textContent = getFriendDisplayName(peerId);
+                        currentChatAvatar.textContent = friend.avatar;
+                        if (friend.avatarImage) {
+                            currentChatAvatar.style.backgroundImage = `url(${friend.avatarImage})`;
+                            currentChatAvatar.textContent = '';
+                        } else {
+                            currentChatAvatar.style.backgroundImage = '';
+                            currentChatAvatar.textContent = friend.avatar;
+                        }
+                        currentChatStatus.textContent = 'Online';
+                        currentChatStatus.style.color = 'var(--online-status)';
+                    }
+                }
+            } else if (data.type === 'message') {
+                // Add to conversations
+                if (!conversations[peerId]) {
+                    conversations[peerId] = [];
+                }
+                
+                const newMessage = {
+                    id: `msg${Date.now()}`,
+                    sender: peerId,
+                    text: data.text,
+                    timestamp: Date.now(),
+                    isLink: isURL(data.text),
+                    attachment: data.attachment
+                };
+                
+                conversations[peerId].push(newMessage);
+                saveAccountData();
+                
+                // Update UI if this chat is open
+                if (currentChatId === peerId) {
+                    renderMessages(peerId);
+                }
+                
+                // Update last message preview
+                updateLastMessagePreview(peerId, data.text);
+            }
+        }
+
+        // Check if text is a URL
+        function isURL(text) {
+            try {
+                new URL(text);
+                return true;
+            } catch {
+                return false;
+            }
+        }
+
+        // Deliver pending messages when connection is established
+        function deliverPendingMessages(peerId = null) {
+            const peersToDeliver = peerId ? [peerId] : Object.keys(pendingMessages);
+            
+            peersToDeliver.forEach(id => {
+                if (connections[id] && pendingMessages[id] && pendingMessages[id].length > 0) {
+                    // Send all pending messages
+                    pendingMessages[id].forEach(message => {
+                        connections[id].send({
+                            type: 'message',
+                            text: message.text,
+                            attachment: message.attachment
+                        });
+                    });
+                    
+                    // Clear pending messages for this peer
+                    delete pendingMessages[id];
+                    saveAccountData();
+                }
+            });
+        }
+
+        // Get friend's display name (with custom name if set)
+        function getFriendDisplayName(friendId) {
+            if (currentUserData.customNames && currentUserData.customNames[friendId]) {
+                return currentUserData.customNames[friendId];
+            }
+            
+            const friend = currentUserData.friends.find(f => f.id === friendId);
+            return friend ? friend.name : `User (${friendId.substring(0, 6)}...)`;
+        }
+
+        // DOM elements
+        const sidebar = document.getElementById('sidebar');
+        const mainChat = document.getElementById('main-chat');
+        const chatsList = document.getElementById('chats-list');
+        const messagesContainer = document.getElementById('messages-container');
+        const messageInput = document.getElementById('message-input');
+        const currentChatName = document.getElementById('current-chat-name');
+        const currentChatAvatar = document.getElementById('current-chat-avatar');
+        const currentChatStatus = document.getElementById('current-chat-status');
+        const backToChatsBtn = document.getElementById('back-to-chats');
+        const searchInput = document.getElementById('search-input');
+        const currentUserIdDisplay = document.getElementById('current-user-id');
+        const currentUserAvatar = document.getElementById('current-user-avatar');
+        const currentUserName = document.getElementById('current-user-name');
+        const sendBtn = document.getElementById('send-btn');
+        const emojiBtn = document.getElementById('emoji-btn');
+        const emojiPicker = document.getElementById('emoji-picker');
+        const emojiSearch = document.getElementById('emoji-search');
+        const friendOptionsBtn = document.getElementById('friend-options-btn');
+        const friendOptions = document.getElementById('friend-options');
+        const setCustomNameBtn = document.getElementById('set-custom-name');
+        const viewProfileBtn = document.getElementById('view-profile');
+        const blockFriendBtn = document.getElementById('block-friend');
+        const deleteFriendBtn = document.getElementById('delete-friend');
+        const customNameModal = document.getElementById('custom-name-modal');
+        const customNameInput = document.getElementById('custom-name-input');
+        const saveCustomNameBtn = document.getElementById('save-custom-name');
+        const cancelCustomNameBtn = document.getElementById('cancel-custom-name');
+        const closeCustomNameModalBtn = document.getElementById('close-custom-name-modal');
+        const imagePreviewModal = document.getElementById('image-preview-modal');
+        const imagePreviewContent = document.getElementById('image-preview-content');
+        const closePreviewBtn = document.getElementById('close-preview');
+        const attachmentBtn = document.getElementById('attachment-btn');
+        const fileInput = document.getElementById('file-input');
+        const profileModal = document.getElementById('profile-modal');
+        const profileModalTitle = document.getElementById('profile-modal-title');
+        const profileAvatar = document.getElementById('profile-avatar');
+        const profileName = document.getElementById('profile-name');
+        const profileId = document.getElementById('profile-id');
+        const profileStatus = document.getElementById('profile-status');
+        const profileAbout = document.getElementById('profile-about');
+        const closeProfileModalBtn = document.getElementById('close-profile-modal');
+        const passwordModal = document.getElementById('password-modal');
+        const currentPasswordInput = document.getElementById('current-password');
+        const newPasswordInput = document.getElementById('new-password');
+        const confirmNewPasswordInput = document.getElementById('confirm-new-password');
+        const passwordError = document.getElementById('password-error');
+        const closePasswordModalBtn = document.getElementById('close-password-modal');
+        const cancelPasswordBtn = document.getElementById('cancel-password');
+        const savePasswordBtn = document.getElementById('save-password');
+        const changePasswordBtn = document.getElementById('change-password-btn');
+        const privacySettingsBtn = document.getElementById('privacy-settings-btn');
+        const privacySettingsModal = document.getElementById('privacy-settings-modal');
+        const closePrivacyModalBtn = document.getElementById('close-privacy-modal');
+        const cancelPrivacyBtn = document.getElementById('cancel-privacy');
+        const savePrivacyBtn = document.getElementById('save-privacy');
+        const friendPrivacySelect = document.getElementById('friend-privacy');
+        const statusPrivacySelect = document.getElementById('status-privacy');
+        const avatarPrivacySelect = document.getElementById('avatar-privacy');
+        const blocklistBtn = document.getElementById('blocklist-btn');
+        const blocklistModal = document.getElementById('blocklist-modal');
+        const blocklistBody = document.getElementById('blocklist-body');
+        const closeBlocklistModalBtn = document.getElementById('close-blocklist-modal');
+        const closeBlocklistBtn = document.getElementById('close-blocklist');
+        const changeUsernameBtn = document.getElementById('change-username-btn');
+        const changeUsernameModal = document.getElementById('change-username-modal');
+        const newUsernameInput = document.getElementById('new-username');
+        const usernamePasswordInput = document.getElementById('username-password');
+        const usernameError = document.getElementById('username-error');
+        const saveUsernameBtn = document.getElementById('save-username');
+        const cancelUsernameBtn = document.getElementById('cancel-username');
+        const closeUsernameModalBtn = document.getElementById('close-username-modal');
+        const deleteAccountBtn = document.getElementById('delete-account-btn');
+        const deleteAccountModal = document.getElementById('delete-account-modal');
+        const deletePasswordInput = document.getElementById('delete-password');
+        const deleteError = document.getElementById('delete-error');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        const closeDeleteModalBtn = document.getElementById('close-delete-modal');
+
+        // Modal elements
+        const addFriendModal = document.getElementById('add-friend-modal');
+        const addFriendBtn = document.getElementById('add-friend-btn');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelAddFriendBtn = document.getElementById('cancel-add-friend');
+        const confirmAddFriendBtn = document.getElementById('confirm-add-friend');
+        const friendIdInput = document.getElementById('friend-id-input');
+        const addFriendError = document.getElementById('add-friend-error');
+
+        // Settings modal elements
+        const settingsModal = document.getElementById('settings-modal');
+        const settingsBtn = document.getElementById('settings-btn');
+        const closeSettingsModalBtn = document.getElementById('close-settings-modal');
+        const cancelSettingsBtn = document.getElementById('cancel-settings');
+        const saveSettingsBtn = document.getElementById('save-settings');
+        const nameInput = document.getElementById('name-input');
+        const avatarUpload = document.getElementById('avatar-upload');
+        const uploadAvatarBtn = document.getElementById('upload-avatar-btn');
+        const settingsName = document.getElementById('settings-name');
+        const settingsAvatar = document.getElementById('settings-avatar');
+        const settingsId = document.getElementById('settings-id');
+
+        // State
+        let currentChatId = null;
+        let emojiPickerOpen = false;
+
+        // Emoji categories
+        const emojiCategories = {
+            'smileys-people': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '💩', '👻', '💀', '☠️', '👽', '👾', '🤖', '🎃', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'],
+            'animals-nature': ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🕸', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🦣', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🦬', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🦙', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐈‍⬛', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦫', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔'],
+            'food-drink': ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🫚', '🫛', '🥐', '🥯', '🍞', '🥖', '🥨', '🧀', '🥚', '🍳', '🧈', '🥞', '🧇', '🥓', '🥩', '🍗', '🍖', '🦴', '🌭', '🍔', '🍟', '🍕', '🫓', '🥪', '🥙', '🧆', '🌮', '🌯', '🫔', '🥗', '🥘', '🫕', '🥫', '🍝', '🍜', '🍲', '🍛', '🍣', '🍱', '🥟', '🦪', '🍤', '🍙', '🍚', '🍘', '🍥', '🥠', '🥮', '🍢', '🍡', '🍧', '🍨', '🍦', '🥧', '🧁', '🍰', '🎂', '🍮', '🍭', '🍬', '🍫', '🍿', '🍩', '🍪', '🌰', '🥜', '🫘', '🍯'],
+            'activities': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷', '⛸', '🥌', '🎯', '🪂', '🎱', '🎮', '🕹', '🎰', '🎲', '🧩', '♟', '🪄', '🎭', '🎨', '🧵', '🪡', '🧶', '🪢', '👓', '🕶', '🥽', '🥼', '🦺', '👔', '👕', '👖', '🧣', '🧤', '🧥', '🧦', '👗', '👘', '🥻', '🩱', '🩲', '🩳', '👙', '👚', '👛', '👜', '👝', '🛍', '🎒', '🩴', '👞', '👟', '🥾', '🥿', '👠', '👡', '🩰', '👢', '👑', '👒', '🎩', '🎓', '🧢', '🪖', '⛑', '📿', '💄', '💍', '💎']
+        };
+
+        // Emoji search index
+        const emojiSearchIndex = {
+            'happy': ['😀', '😃', '😄', '😁', '😆', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '😎', '🤩', '🥳'],
+            'sad': ['😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭'],
+            'angry': ['😤', '😠', '😡', '🤬', '🤯'],
+            'love': ['😍', '🥰', '😘', '😗', '😙', '😚', '😻'],
+            'laugh': ['😂', '🤣', '😆', '😅'],
+            'cry': ['😢', '😭', '🥺'],
+            'surprise': ['😲', '😮', '😯', '😧', '😦'],
+            'wink': ['😉', '😜', '😘'],
+            'cool': ['😎', '🆒', '🤠'],
+            'sick': ['🤢', '🤮', '🤧', '😷', '🤒', '🤕'],
+            'sleep': ['😴', '🥱', '😪'],
+            'scared': ['😱', '😨', '😰', '😥', '😓'],
+            'confused': ['😕', '😟', '😳', '😵', '🤔'],
+            'neutral': ['😐', '😑', '😶', '🙄'],
+            'animal': ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄'],
+            'food': ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🫐', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦', '🥬', '🥒', '🌶', '🫑', '🌽', '🥕', '🫒', '🧄', '🧅', '🥔', '🍠', '🍕', '🍔', '🍟', '🌭', '🍿', '🍩', '🍪', '🍰', '🎂', '🍫', '🍬', '🍭'],
+            'sport': ['⚽', '🏀', '🏈', '⚾', '🥎', '🎾', '🏐', '🏉', '🥏', '🎱', '🪀', '🏓', '🏸', '🏒', '🏑', '🥍', '🏏', '🪃', '🥅', '⛳', '🪁', '🏹', '🎣', '🤿', '🥊', '🥋', '🎽', '🛹', '🛼', '🛷', '⛸', '🥌', '🎯', '🪂']
+        };
+
+        // Initialize the app
+        function initializeApp() {
+            // Hide auth, show app
+            authContainer.style.display = 'none';
+            appContainer.style.display = 'flex';
+            
+            // Set current user info
+            currentUserIdDisplay.textContent = `ID: ${currentUserData.userId}`;
+            updateUserAvatarDisplay();
+            currentUserName.textContent = currentUserData.name;
+            
+            // Set settings modal values
+            settingsId.textContent = `ID: ${currentUserData.userId}`;
+            settingsName.textContent = currentUserData.name;
+            nameInput.value = currentUserData.name;
+            
+            // Set privacy settings
+            friendPrivacySelect.value = privacySettings.friendRequests;
+            statusPrivacySelect.value = privacySettings.onlineStatus;
+            avatarPrivacySelect.value = privacySettings.profilePicture;
+            
+            // Load emojis
+            loadEmojis();
+            
+            renderChatsList();
+            setupEventListeners();
+            initializePeerJS();
+            
+            // For mobile view
+            if (window.innerWidth <= 768) {
+                sidebar.classList.add('active');
+                mainChat.classList.remove('active');
+            }
+        }
+
+        // Update user avatar display
+        function updateUserAvatarDisplay() {
+            if (currentUserData.avatarImage) {
+                currentUserAvatar.style.backgroundImage = `url(${currentUserData.avatarImage})`;
+                currentUserAvatar.textContent = '';
+                settingsAvatar.style.backgroundImage = `url(${currentUserData.avatarImage})`;
+                settingsAvatar.textContent = '';
+            } else {
+                currentUserAvatar.style.backgroundImage = '';
+                currentUserAvatar.textContent = currentUserData.avatar;
+                settingsAvatar.style.backgroundImage = '';
+                settingsAvatar.textContent = currentUserData.avatar;
+            }
+        }
+
+        // Load emojis into picker
+        function loadEmojis() {
+            for (const category in emojiCategories) {
+                const container = document.getElementById(category);
+                container.innerHTML = ''; // Clear existing emojis
+                emojiCategories[category].forEach(emoji => {
+                    const emojiElement = document.createElement('div');
+                    emojiElement.className = 'emoji';
+                    emojiElement.textContent = emoji;
+                    emojiElement.dataset.emoji = emoji;
+                    emojiElement.addEventListener('click', () => {
+                        messageInput.value += emoji;
+                        messageInput.focus();
+                    });
+                    container.appendChild(emojiElement);
+                });
+            }
+        }
+
+        // Filter emojis based on search
+        function filterEmojis(searchTerm) {
+            if (!searchTerm) {
+                // Show all emojis if search is empty
+                document.querySelectorAll('.emoji').forEach(emoji => {
+                    emoji.style.display = 'block';
+                });
+                return;
+            }
+
+            // First check our search index
+            const searchTermLower = searchTerm.toLowerCase();
+            const matchedEmojis = [];
+            
+            for (const keyword in emojiSearchIndex) {
+                if (keyword.includes(searchTermLower)) {
+                    matchedEmojis.push(...emojiSearchIndex[keyword]);
+                }
+            }
+
+            // Then check all emojis
+            const allEmojis = document.querySelectorAll('.emoji');
+            allEmojis.forEach(emoji => {
+                const emojiText = emoji.dataset.emoji;
+                if (matchedEmojis.includes(emojiText)) {
+                    emoji.style.display = 'block';
+                } else {
+                    emoji.style.display = 'none';
+                }
+            });
+        }
+
+        // Render the chats list
+        function renderChatsList(filter = '') {
+            chatsList.innerHTML = '';
+            
+            const filteredFriends = currentUserData.friends.filter(friend => 
+                (friend.name.toLowerCase().includes(filter.toLowerCase()) ||
+                friend.id.toLowerCase().includes(filter.toLowerCase())) &&
+                !blockedUsers[friend.id]
+            );
+            
+            if (filteredFriends.length === 0) {
+                chatsList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-user-times"></i>
+                        <h3>No contacts found</h3>
+                        <p>Try adding friends using their ID</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            filteredFriends.forEach(friend => {
+                const lastMessage = conversations[friend.id]?.[conversations[friend.id].length - 1];
+                const displayName = getFriendDisplayName(friend.id);
+                
+                const chatItem = document.createElement('div');
+                chatItem.className = `chat-item ${currentChatId === friend.id ? 'active' : ''}`;
+                chatItem.dataset.userId = friend.id;
+                
+                // Set avatar background if image exists
+                let avatarContent = friend.avatar;
+                let avatarStyle = '';
+                if (friend.avatarImage) {
+                    avatarContent = '';
+                    avatarStyle = `style="background-image: url(${friend.avatarImage})"`;
+                }
+                
+                chatItem.innerHTML = `
+                    <div class="chat-avatar ${friend.lastSeen === null || friend.lastSeen > Date.now() - 300000 ? 'online' : ''}" ${avatarStyle}>${avatarContent}</div>
+                    <div class="chat-info">
+                        <div class="chat-name">${displayName}</div>
+                        <div class="chat-preview">${lastMessage ? formatLastMessagePreview(lastMessage, friend.id) : 'No messages yet'}</div>
+                    </div>
+                    <div class="chat-time">${formatTime(lastMessage?.timestamp || friend.lastSeen)}</div>
+                `;
+                
+                chatItem.addEventListener('click', () => openChat(friend.id));
+                chatsList.appendChild(chatItem);
+            });
+        }
+
+        // Format last message preview
+        function formatLastMessagePreview(message, friendId) {
+            let preview = message.sender === 'currentUser' ? 'You: ' : '';
+            
+            if (message.attachment) {
+                preview += '📎 Attachment';
+            } else {
+                preview += message.text;
+            }
+            
+            return preview;
+        }
+
+        // Open a chat
+        function openChat(userId) {
+            currentChatId = userId;
+            const friend = currentUserData.friends.find(f => f.id === userId);
+            
+            if (!friend) return;
+            
+            currentChatName.textContent = getFriendDisplayName(userId);
+            
+            // Set avatar
+            if (friend.avatarImage) {
+                currentChatAvatar.style.backgroundImage = `url(${friend.avatarImage})`;
+                currentChatAvatar.textContent = '';
+            } else {
+                currentChatAvatar.style.backgroundImage = '';
+                currentChatAvatar.textContent = friend.avatar;
+            }
+            
+            if (friend.lastSeen === null || friend.lastSeen > Date.now() - 300000) {
+                currentChatStatus.textContent = 'Online';
+                currentChatStatus.style.color = 'var(--online-status)';
+            } else {
+                currentChatStatus.textContent = `Last seen ${formatLastSeen(friend.lastSeen)}`;
+                currentChatStatus.style.color = 'var(--text-secondary)';
+            }
+            
+            renderMessages(userId);
+            messageInput.disabled = false;
+            messageInput.placeholder = "Type a message...";
+            
+            // For mobile view
+            if (window.innerWidth <= 768) {
+                sidebar.classList.remove('active');
+                mainChat.classList.add('active');
+            }
+            
+            // Mark as read (update last seen)
+            if (!friend.isBot) {
+                friend.lastSeen = Date.now();
+                saveAccountData();
+                renderChatsList();
+                
+                // Connect to this peer if not already connected
+                if (!connections[userId] && userId !== 'ligaander_bot') {
+                    connectToPeer(userId);
+                }
+            }
+        }
+
+        // Format last seen time
+        function formatLastSeen(timestamp) {
+            if (!timestamp) return 'a long time ago';
+            
+            const diff = Date.now() - timestamp;
+            const minutes = Math.floor(diff / 60000);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+            
+            if (minutes < 1) return 'just now';
+            if (minutes < 60) return `${minutes}m ago`;
+            if (hours < 24) return `${hours}h ago`;
+            if (days === 1) return 'yesterday';
+            return `${days}d ago`;
+        }
+
+        // Render messages for a chat
+        function renderMessages(userId) {
+            messagesContainer.innerHTML = '';
+            
+            if (!userId || !conversations[userId]) {
+                messagesContainer.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-comment-dots"></i>
+                        <h3>No messages yet</h3>
+                        <p>Start the conversation</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const messages = conversations[userId];
+            
+            messages.forEach(message => {
+                const isCurrentUser = message.sender === 'currentUser';
+                
+                if (message.attachment) {
+                    renderAttachmentMessage(message, isCurrentUser);
+                } else {
+                    renderTextMessage(message, isCurrentUser);
+                }
+            });
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        // Render a text message
+        function renderTextMessage(message, isCurrentUser) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
+            
+            // Add message actions
+            const messageActions = document.createElement('div');
+            messageActions.className = 'message-actions';
+            
+            const ttsButton = document.createElement('div');
+            ttsButton.className = 'message-action';
+            ttsButton.innerHTML = '<i class="fas fa-volume-up"></i>';
+            ttsButton.addEventListener('click', () => speakMessage(message.text));
+            
+            messageActions.appendChild(ttsButton);
+            
+            // Check if message contains a URL
+            let messageContent = message.text;
+            if (message.isLink) {
+                // Check if it's a YouTube URL
+                if (isYouTubeURL(message.text)) {
+                    const videoId = getYouTubeVideoId(message.text);
+                    if (videoId) {
+                        messageContent += `<div class="video-player">
+                            <iframe width="100%" height="200" src="https://www.youtube.com/embed/${videoId}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>`;
+                    } else {
+                        messageContent += `<div class="link-preview" data-url="${message.text}">
+                            <div class="link-preview-title">Link Preview</div>
+                            <div class="link-preview-description">Click to open this link</div>
+                            <div class="link-preview-url">${message.text}</div>
+                        </div>`;
+                    }
+                } else {
+                    messageContent += `<div class="link-preview" data-url="${message.text}">
+                        <div class="link-preview-title">Link Preview</div>
+                        <div class="link-preview-description">Click to open this link</div>
+                        <div class="link-preview-url">${message.text}</div>
+                    </div>`;
+                }
+            }
+            
+            messageElement.innerHTML = `
+                ${messageContent}
+                <span class="message-time">${formatTime(message.timestamp, true)}</span>
+            `;
+            
+            messageElement.appendChild(messageActions);
+            messagesContainer.appendChild(messageElement);
+            
+            // Add click handler for link previews
+            if (message.isLink) {
+                const linkPreview = messageElement.querySelector('.link-preview');
+                if (linkPreview) {
+                    linkPreview.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        
+                        // Check if it's an image URL
+                        if (isImageURL(message.text)) {
+                            showImagePreview(message.text);
+                        } else {
+                            window.open(message.text, '_blank');
+                        }
+                    });
+                }
+            }
+        }
+
+        // Render an attachment message
+        function renderAttachmentMessage(message, isCurrentUser) {
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isCurrentUser ? 'sent' : 'received'}`;
+            
+            let attachmentContent = '';
+            const attachment = message.attachment;
+            
+            if (attachment.type.startsWith('image/')) {
+                attachmentContent = `<img src="${attachment.url}" style="max-width: 100%; border-radius: 8px; cursor: pointer;" onclick="document.getElementById('image-preview-content').innerHTML = '<img src=\\'${attachment.url}\\' style=\\'max-width: 100%\\'>'; document.getElementById('image-preview-modal').style.display = 'flex';">`;
+            } else if (attachment.type.startsWith('video/')) {
+                attachmentContent = `<video controls style="max-width: 100%; border-radius: 8px;">
+                    <source src="${attachment.url}" type="${attachment.type}">
+                    Your browser does not support the video tag.
+                </video>`;
+            } else {
+                attachmentContent = `
+                    <div class="attachment-preview" onclick="window.open('${attachment.url}', '_blank')">
+                        <div class="attachment-icon">
+                            <i class="fas ${getFileIcon(attachment.name)}"></i>
+                        </div>
+                        <div class="attachment-name">${attachment.name}</div>
+                    </div>
+                `;
+            }
+            
+            messageElement.innerHTML = `
+                ${attachmentContent}
+                <span class="message-time">${formatTime(message.timestamp, true)}</span>
+            `;
+            
+            messagesContainer.appendChild(messageElement);
+        }
+
+        // Get icon for file type
+        function getFileIcon(filename) {
+            const extension = filename.split('.').pop().toLowerCase();
+            
+            switch(extension) {
+                case 'pdf':
+                    return 'fa-file-pdf';
+                case 'doc':
+                case 'docx':
+                    return 'fa-file-word';
+                case 'xls':
+                case 'xlsx':
+                    return 'fa-file-excel';
+                case 'ppt':
+                case 'pptx':
+                    return 'fa-file-powerpoint';
+                case 'zip':
+                case 'rar':
+                case '7z':
+                    return 'fa-file-archive';
+                case 'mp3':
+                case 'wav':
+                case 'ogg':
+                    return 'fa-file-audio';
+                default:
+                    return 'fa-file';
+            }
+        }
+
+        // Check if URL is a YouTube URL
+        function isYouTubeURL(url) {
+            return url.includes('youtube.com') || url.includes('youtu.be');
+        }
+
+        // Get YouTube video ID from URL
+        function getYouTubeVideoId(url) {
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+            const match = url.match(regExp);
+            
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Check if URL is an image
+        function isImageURL(url) {
+            return /\.(jpg|jpeg|png|webp|avif|gif|svg)$/.test(url);
+        }
+
+        // Show image preview
+        function showImagePreview(url) {
+            imagePreviewContent.innerHTML = `<img src="${url}" alt="Preview">`;
+            imagePreviewModal.style.display = 'flex';
+        }
+
+        // Text-to-speech for messages
+        function speakMessage(text) {
+            if ('speechSynthesis' in window) {
+                const utterance = new SpeechSynthesisUtterance(text);
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech is not supported in your browser');
+            }
+        }
+
+        // Format timestamp
+        function formatTime(timestamp, short = false) {
+            if (!timestamp) return '';
+            
+            const date = new Date(timestamp);
+            const now = new Date();
+            
+            if (short) {
+                return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            }
+            
+            if (date.toDateString() === now.toDateString()) {
+                return 'Today';
+            }
+            
+            if (date.toDateString() === new Date(now.getTime() - 86400000).toDateString()) {
+                return 'Yesterday';
+            }
+            
+            if (now.getTime() - timestamp < 604800000) { // Less than 7 days
+                return date.toLocaleDateString([], { weekday: 'short' });
+            }
+            
+            return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Send message on Enter key or send button
+            messageInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' && (messageInput.value.trim() || currentAttachment) && currentChatId) {
+                    sendMessage(messageInput.value.trim());
+                    messageInput.value = '';
+                    currentAttachment = null;
+                }
+            });
+            
+            sendBtn.addEventListener('click', () => {
+                if ((messageInput.value.trim() || currentAttachment) && currentChatId) {
+                    sendMessage(messageInput.value.trim());
+                    messageInput.value = '';
+                    currentAttachment = null;
+                }
+            });
+            
+            // Emoji picker
+            emojiBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                emojiPicker.classList.toggle('active');
+                emojiPickerOpen = emojiPicker.classList.contains('active');
+                if (emojiPickerOpen) {
+                    emojiSearch.focus();
+                }
+            });
+            
+            // Emoji search
+            emojiSearch.addEventListener('input', (e) => {
+                filterEmojis(e.target.value);
+            });
+            
+            // Close emoji picker when clicking outside, but only if not clicking on emoji
+            document.addEventListener('click', (e) => {
+                if (emojiPickerOpen && !e.target.closest('.emoji-picker') && !e.target.closest('#emoji-btn')) {
+                    emojiPicker.classList.remove('active');
+                    emojiPickerOpen = false;
+                }
+            });
+            
+            // Search chats
+            searchInput.addEventListener('input', (e) => {
+                renderChatsList(e.target.value);
+            });
+            
+            // Back to chats list on mobile
+            backToChatsBtn.addEventListener('click', () => {
+                sidebar.classList.add('active');
+                mainChat.classList.remove('active');
+            });
+            
+            // Friend options menu
+            friendOptionsBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                if (currentChatId) {
+                    friendOptions.classList.toggle('active');
+                }
+            });
+            
+            // Close friend options when clicking outside
+            document.addEventListener('click', () => {
+                friendOptions.classList.remove('active');
+            });
+            
+            // Set custom name
+            setCustomNameBtn.addEventListener('click', () => {
+                friendOptions.classList.remove('active');
+                customNameInput.value = getFriendDisplayName(currentChatId);
+                customNameModal.style.display = 'flex';
+            });
+            
+            // View profile
+            viewProfileBtn.addEventListener('click', () => {
+                friendOptions.classList.remove('active');
+                const friend = currentUserData.friends.find(f => f.id === currentChatId);
+                if (friend) {
+                    profileModalTitle.textContent = `${getFriendDisplayName(currentChatId)}'s Profile`;
+                    profileName.textContent = getFriendDisplayName(currentChatId);
+                    profileId.textContent = `ID: ${friend.id}`;
+                    
+                    if (friend.avatarImage) {
+                        profileAvatar.style.backgroundImage = `url(${friend.avatarImage})`;
+                        profileAvatar.textContent = '';
+                    } else {
+                        profileAvatar.style.backgroundImage = '';
+                        profileAvatar.textContent = friend.avatar;
+                    }
+                    
+                    if (friend.lastSeen === null || friend.lastSeen > Date.now() - 300000) {
+                        profileStatus.textContent = 'Online';
+                        profileStatus.style.color = 'var(--online-status)';
+                    } else {
+                        profileStatus.textContent = `Last seen ${formatLastSeen(friend.lastSeen)}`;
+                        profileStatus.style.color = 'var(--text-secondary)';
+                    }
+                    
+                    profileAbout.textContent = friend.about || 'No bio yet';
+                    profileModal.style.display = 'flex';
+                }
+            });
+            
+            // Block friend
+            blockFriendBtn.addEventListener('click', () => {
+                friendOptions.classList.remove('active');
+                if (confirm(`Are you sure you want to block ${getFriendDisplayName(currentChatId)}?`)) {
+                    blockedUsers[currentChatId] = true;
+                    saveAccountData();
+                    
+                    // Close connection if exists
+                    if (connections[currentChatId]) {
+                        connections[currentChatId].close();
+                        delete connections[currentChatId];
+                    }
+                    
+                    // Remove from friends list
+                    currentUserData.friends = currentUserData.friends.filter(f => f.id !== currentChatId);
+                    saveAccountData();
+                    
+                    // Go back to chats list
+                    currentChatId = null;
+                    renderChatsList();
+                    messagesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comment-dots"></i>
+                            <h3>No chat selected</h3>
+                            <p>Select a conversation or add a friend to start messaging</p>
+                        </div>
+                    `;
+                    messageInput.disabled = true;
+                    messageInput.placeholder = "Select a chat to message";
+                }
+            });
+            
+            // Delete friend
+            deleteFriendBtn.addEventListener('click', () => {
+                friendOptions.classList.remove('active');
+                if (confirm(`Are you sure you want to delete ${getFriendDisplayName(currentChatId)} from your contacts?`)) {
+                    // Remove from friends list
+                    currentUserData.friends = currentUserData.friends.filter(f => f.id !== currentChatId);
+                    saveAccountData();
+                    
+                    // Go back to chats list
+                    currentChatId = null;
+                    renderChatsList();
+                    messagesContainer.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-comment-dots"></i>
+                            <h3>No chat selected</h3>
+                            <p>Select a conversation or add a friend to start messaging</p>
+                        </div>
+                    `;
+                    messageInput.disabled = true;
+                    messageInput.placeholder = "Select a chat to message";
+                }
+            });
+            
+            // Save custom name
+            saveCustomNameBtn.addEventListener('click', () => {
+                const customName = customNameInput.value.trim();
+                if (customName) {
+                    if (!currentUserData.customNames) {
+                        currentUserData.customNames = {};
+                    }
+                    currentUserData.customNames[currentChatId] = customName;
+                    saveAccountData();
+                    customNameModal.style.display = 'none';
+                    
+                    // Update UI
+                    currentChatName.textContent = customName;
+                    renderChatsList();
+                }
+            });
+            
+            // Cancel custom name
+            cancelCustomNameBtn.addEventListener('click', () => {
+                customNameModal.style.display = 'none';
+            });
+            
+            closeCustomNameModalBtn.addEventListener('click', () => {
+                customNameModal.style.display = 'none';
+            });
+            
+            // Close image preview
+            closePreviewBtn.addEventListener('click', () => {
+                imagePreviewModal.style.display = 'none';
+            });
+            
+            // Close profile modal
+            closeProfileModalBtn.addEventListener('click', () => {
+                profileModal.style.display = 'none';
+            });
+            
+            // Attachment button
+            attachmentBtn.addEventListener('click', () => {
+                fileInput.click();
+            });
+            
+            // File input change
+            fileInput.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        currentAttachment = {
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            url: event.target.result
+                        };
+                        
+                        // Send the attachment immediately
+                        if (currentChatId) {
+                            sendMessage('');
+                        }
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Responsive layout
+            window.addEventListener('resize', () => {
+                if (window.innerWidth > 768) {
+                    sidebar.classList.add('active');
+                    mainChat.classList.add('active');
+                } else if (!currentChatId) {
+                    sidebar.classList.add('active');
+                    mainChat.classList.remove('active');
+                }
+            });
+            
+            // Add friend modal
+            addFriendBtn.addEventListener('click', () => {
+                addFriendModal.style.display = 'flex';
+                friendIdInput.focus();
+            });
+            
+            closeModalBtn.addEventListener('click', () => {
+                addFriendModal.style.display = 'none';
+                addFriendError.style.display = 'none';
+                friendIdInput.value = '';
+            });
+            
+            cancelAddFriendBtn.addEventListener('click', () => {
+                addFriendModal.style.display = 'none';
+                addFriendError.style.display = 'none';
+                friendIdInput.value = '';
+            });
+            
+            confirmAddFriendBtn.addEventListener('click', addFriend);
+            
+            friendIdInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addFriend();
+                }
+            });
+            
+            // Settings modal
+            settingsBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'flex';
+            });
+            
+            closeSettingsModalBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+            });
+            
+            cancelSettingsBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+                nameInput.value = currentUserData.name;
+            });
+            
+            saveSettingsBtn.addEventListener('click', saveSettings);
+            
+            // Avatar upload
+            uploadAvatarBtn.addEventListener('click', () => {
+                avatarUpload.click();
+            });
+            
+            avatarUpload.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        currentUserData.avatarImage = event.target.result;
+                        updateUserAvatarDisplay();
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+            
+            // Change password button
+            changePasswordBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+                passwordModal.style.display = 'flex';
+                currentPasswordInput.value = '';
+                newPasswordInput.value = '';
+                confirmNewPasswordInput.value = '';
+                passwordError.style.display = 'none';
+            });
+            
+            // Close password modal
+            closePasswordModalBtn.addEventListener('click', () => {
+                passwordModal.style.display = 'none';
+            });
+            
+            cancelPasswordBtn.addEventListener('click', () => {
+                passwordModal.style.display = 'none';
+            });
+            
+            // Save new password
+            savePasswordBtn.addEventListener('click', () => {
+                const currentPassword = currentPasswordInput.value;
+                const newPassword = newPasswordInput.value;
+                const confirmNewPassword = confirmNewPasswordInput.value;
+                
+                if (!currentPassword || !newPassword || !confirmNewPassword) {
+                    passwordError.textContent = 'Please fill all fields';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+                
+                if (hashPassword(currentPassword) !== accountsDB[currentAccount].password) {
+                    passwordError.textContent = 'Current password is incorrect';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+                
+                if (newPassword !== confirmNewPassword) {
+                    passwordError.textContent = 'New passwords do not match';
+                    passwordError.style.display = 'block';
+                    return;
+                }
+                
+                // Update password
+                accountsDB[currentAccount].password = hashPassword(newPassword);
+                localStorage.setItem('ligaanderAccounts', JSON.stringify(accountsDB));
+                
+                passwordModal.style.display = 'none';
+                alert('Password changed successfully');
+            });
+            
+            // Privacy settings button
+            privacySettingsBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+                privacySettingsModal.style.display = 'flex';
+            });
+            
+            // Close privacy modal
+            closePrivacyModalBtn.addEventListener('click', () => {
+                privacySettingsModal.style.display = 'none';
+            });
+            
+            cancelPrivacyBtn.addEventListener('click', () => {
+                privacySettingsModal.style.display = 'none';
+            });
+            
+            // Save privacy settings
+            savePrivacyBtn.addEventListener('click', () => {
+                privacySettings = {
+                    friendRequests: friendPrivacySelect.value,
+                    onlineStatus: statusPrivacySelect.value,
+                    profilePicture: avatarPrivacySelect.value
+                };
+                saveAccountData();
+                privacySettingsModal.style.display = 'none';
+                alert('Privacy settings updated');
+            });
+            
+            // Blocklist button
+            blocklistBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+                renderBlocklist();
+                blocklistModal.style.display = 'flex';
+            });
+            
+            // Close blocklist modal
+            closeBlocklistModalBtn.addEventListener('click', () => {
+                blocklistModal.style.display = 'none';
+            });
+            
+            closeBlocklistBtn.addEventListener('click', () => {
+                blocklistModal.style.display = 'none';
+            });
+            
+            // Change username button
+            changeUsernameBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+                changeUsernameModal.style.display = 'flex';
+                newUsernameInput.value = '';
+                usernamePasswordInput.value = '';
+                usernameError.style.display = 'none';
+            });
+            
+            // Close username modal
+            closeUsernameModalBtn.addEventListener('click', () => {
+                changeUsernameModal.style.display = 'none';
+            });
+            
+            cancelUsernameBtn.addEventListener('click', () => {
+                changeUsernameModal.style.display = 'none';
+            });
+            
+            // Save new username
+            saveUsernameBtn.addEventListener('click', () => {
+                const newUsername = newUsernameInput.value.trim();
+                const password = usernamePasswordInput.value;
+                
+                if (!newUsername || !password) {
+                    usernameError.textContent = 'Please fill all fields';
+                    usernameError.style.display = 'block';
+                    return;
+                }
+                
+                if (accountsDB[newUsername] && newUsername !== currentAccount) {
+                    usernameError.textContent = 'Username already exists';
+                    usernameError.style.display = 'block';
+                    return;
+                }
+                
+                if (hashPassword(password) !== accountsDB[currentAccount].password) {
+                    usernameError.textContent = 'Password is incorrect';
+                    usernameError.style.display = 'block';
+                    return;
+                }
+                
+                // Update username
+                accountsDB[newUsername] = accountsDB[currentAccount];
+                delete accountsDB[currentAccount];
+                currentAccount = newUsername;
+                currentUserData.name = newUsername;
+                saveAccountData();
+                
+                // Update UI
+                currentUserName.textContent = newUsername;
+                settingsName.textContent = newUsername;
+                nameInput.value = newUsername;
+                
+                changeUsernameModal.style.display = 'none';
+                alert('Username changed successfully. Please note you will need to use this new username to login.');
+            });
+            
+            // Delete account button
+            deleteAccountBtn.addEventListener('click', () => {
+                settingsModal.style.display = 'none';
+                deleteAccountModal.style.display = 'flex';
+                deletePasswordInput.value = '';
+                deleteError.style.display = 'none';
+            });
+            
+            // Close delete modal
+            closeDeleteModalBtn.addEventListener('click', () => {
+                deleteAccountModal.style.display = 'none';
+            });
+            
+            cancelDeleteBtn.addEventListener('click', () => {
+                deleteAccountModal.style.display = 'none';
+            });
+            
+            // Confirm account deletion
+            confirmDeleteBtn.addEventListener('click', () => {
+                const password = deletePasswordInput.value;
+                
+                if (!password) {
+                    deleteError.textContent = 'Please enter your password';
+                    deleteError.style.display = 'block';
+                    return;
+                }
+                
+                if (hashPassword(password) !== accountsDB[currentAccount].password) {
+                    deleteError.textContent = 'Password is incorrect';
+                    deleteError.style.display = 'block';
+                    return;
+                }
+                
+                // Delete account
+                delete accountsDB[currentAccount];
+                localStorage.setItem('ligaanderAccounts', JSON.stringify(accountsDB));
+                
+                // Logout and show auth screen
+                currentAccount = null;
+                currentUserData = null;
+                conversations = null;
+                
+                appContainer.style.display = 'none';
+                authContainer.style.display = 'flex';
+                loginForm.style.display = 'flex';
+                registerForm.style.display = 'none';
+                
+                alert('Your account has been deleted successfully.');
+            });
+        }
+
+        // Render blocklist
+        function renderBlocklist() {
+            blocklistBody.innerHTML = '';
+            
+            const blockedUserIds = Object.keys(blockedUsers);
+            
+            if (blockedUserIds.length === 0) {
+                blocklistBody.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <i class="fas fa-ban" style="font-size: 24px; margin-bottom: 10px;"></i>
+                        <p>No blocked users</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            blockedUserIds.forEach(userId => {
+                const blockedUser = document.createElement('div');
+                blockedUser.className = 'blocklist-item';
+                
+                // Try to find the user in friends list to get their name
+                const friend = currentUserData.friends.find(f => f.id === userId);
+                const displayName = friend ? friend.name : `User (${userId.substring(0, 6)}...)`;
+                
+                blockedUser.innerHTML = `
+                    <div>${displayName}</div>
+                    <button class="unblock-btn" data-user-id="${userId}">Unblock</button>
+                `;
+                
+                blocklistBody.appendChild(blockedUser);
+                
+                // Add unblock event listener
+                blockedUser.querySelector('.unblock-btn').addEventListener('click', () => {
+                    if (confirm(`Unblock ${displayName}?`)) {
+                        delete blockedUsers[userId];
+                        saveAccountData();
+                        renderBlocklist();
+                    }
+                });
+            });
+        }
+
+        // Update last message preview in chats list
+        function updateLastMessagePreview(userId, text) {
+            const chatItem = document.querySelector(`.chat-item[data-user-id="${userId}"] .chat-preview`);
+            if (chatItem) {
+                chatItem.textContent = text.length > 30 ? text.substring(0, 30) + '...' : text;
+            }
+            
+            const chatTime = document.querySelector(`.chat-item[data-user-id="${userId}"] .chat-time`);
+            if (chatTime) {
+                chatTime.textContent = 'Now';
+            }
+        }
+
+        // Add a friend by ID
+        function addFriend() {
+            const friendId = friendIdInput.value.trim();
+            
+            if (!friendId) {
+                showAddFriendError("Please enter a friend's ID");
+                return;
+            }
+            
+            if (friendId === currentUserData.userId) {
+                showAddFriendError("You can't add yourself");
+                return;
+            }
+            
+            if (currentUserData.friends.some(f => f.id === friendId)) {
+                showAddFriendError("This user is already your friend");
+                return;
+            }
+            
+            if (blockedUsers[friendId]) {
+                showAddFriendError("This user is blocked and cannot be added");
+                return;
+            }
+            
+            // Add the friend and connect
+            const newFriend = {
+                id: friendId,
+                name: `Friend (${friendId.substring(0, 6)}...)`,
+                avatar: 'F',
+                status: 'Online',
+                lastSeen: Date.now(),
+                about: "Hey there! I'm using Ligaander"
+            };
+            
+            currentUserData.friends.push(newFriend);
+            saveAccountData();
+            
+            if (!conversations[friendId]) {
+                conversations[friendId] = [];
+                saveAccountData();
+            }
+            
+            // Connect to this peer
+            connectToPeer(friendId);
+            
+            addFriendModal.style.display = 'none';
+            friendIdInput.value = '';
+            renderChatsList();
+            openChat(friendId);
+        }
+
+        // Show add friend error
+        function showAddFriendError(message) {
+            addFriendError.textContent = message;
+            addFriendError.style.display = 'block';
+        }
+
+        // Save user settings
+        function saveSettings() {
+            const newName = nameInput.value.trim() || 'You';
+            
+            currentUserData.name = newName;
+            saveAccountData();
+            
+            // Send updated user data to all connected peers
+            Object.values(connections).forEach(conn => {
+                conn.send({
+                    type: 'user-data',
+                    data: currentUserData
+                });
+            });
+            
+            // Update UI
+            currentUserName.textContent = newName;
+            settingsName.textContent = newName;
+            
+            // Update in chats list
+            renderChatsList(searchInput.value);
+            
+            settingsModal.style.display = 'none';
+        }
+
+        // Send a message
+        function sendMessage(text) {
+            if (!currentChatId) return;
+            
+            const newMessage = {
+                id: `msg${Date.now()}`,
+                sender: 'currentUser',
+                text: text,
+                timestamp: Date.now(),
+                isLink: isURL(text),
+                attachment: currentAttachment
+            };
+            
+            if (!conversations[currentChatId]) {
+                conversations[currentChatId] = [];
+            }
+            
+            // Add to conversation history immediately
+            conversations[currentChatId].push(newMessage);
+            saveAccountData();
+            renderMessages(currentChatId);
+            
+            // Update last message in chats list
+            updateLastMessagePreview(currentChatId, `You: ${text || (currentAttachment ? '📎 Attachment' : '')}`);
+            
+            // Check if it's a real peer and send via PeerJS
+            const friend = currentUserData.friends.find(f => f.id === currentChatId);
+            if (friend && !friend.isBot) {
+                if (connections[currentChatId]) {
+                    // If connected, send immediately
+                    connections[currentChatId].send({
+                        type: 'message',
+                        text: text,
+                        attachment: currentAttachment
+                    });
+                } else {
+                    // If not connected, add to pending messages
+                    if (!pendingMessages[currentChatId]) {
+                        pendingMessages[currentChatId] = [];
+                    }
+                    pendingMessages[currentChatId].push(newMessage);
+                    
+                    // Attempt to connect
+                    connectToPeer(currentChatId);
+                }
+            }
+            
+            // Check if it's the bot and generate response
+            if (friend?.isBot) {
+                generateBotResponse(text);
+            }
+        }
+
+        // Generate response from Ligaander Bot using Gemini API
+        async function generateBotResponse(userMessage) {
+            try {
+                // Use the Gemini API key with the 1.5 Flash model
+                const API_KEY = 'AIzaSyBaZ6XYIyMfvMu9Nxvf6wOPXNqCQ9ADRXQ';
+                const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+                
+                // Set up the prompt to focus only on Ligaander-related questions
+                const prompt = `You are Ligaander Bot, the official assistant for the Ligaander messaging app. 
+                Only respond to questions about Ligaander features, settings, or usage. 
+                For any other topics, politely decline to answer and suggest asking about Ligaander instead.
+                
+                User question: ${userMessage}`;
+                
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+                
+                const data = await response.json();
+                
+                let botResponseText = "I'm sorry, I couldn't process your request.";
+                
+                if (data.candidates && data.candidates[0].content.parts[0].text) {
+                    botResponseText = data.candidates[0].content.parts[0].text;
+                }
+                
+                const botResponse = {
+                    id: `msg${Date.now()}`,
+                    sender: currentChatId,
+                    text: botResponseText,
+                    timestamp: Date.now()
+                };
+                
+                if (!conversations[currentChatId]) {
+                    conversations[currentChatId] = [];
+                }
+                
+                conversations[currentChatId].push(botResponse);
+                saveAccountData();
+                renderMessages(currentChatId);
+                updateLastMessagePreview(currentChatId, botResponseText);
+            } catch (error) {
+                console.error('Error generating bot response:', error);
+                
+                const errorResponse = {
+                    id: `msg${Date.now()}`,
+                    sender: currentChatId,
+                    text: "Sorry, I'm having trouble responding right now. Please try again later.",
+                    timestamp: Date.now()
+                };
+                
+                conversations[currentChatId].push(errorResponse);
+                saveAccountData();
+                renderMessages(currentChatId);
+                updateLastMessagePreview(currentChatId, errorResponse.text);
+            }
+        }
+    </script>
+</body>
+</html>
